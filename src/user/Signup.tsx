@@ -2,30 +2,38 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { signup } from "../auth/helper";
 import Menu from "../core/Menu";
+import notify from '../notify';
+
+interface ValuesInterface{
+  name: string,
+  email: string,
+  password: string,
+  error: string,
+  success: string,
+};
 
 const Signup = () => {
-  const [values, setValues] = useState({
+  const [values, setValues] = useState<ValuesInterface>({
     name: "",
     email: "",
     password: "",
     error: "",
-    success: false,
+    success: "",
   });
-  const [isLoading, setIsloading] = useState(false);
-
-  const { name, email, password, error, success } = values;
-
-  const handleChange = (name) => (event) => {
-    setValues({ ...values, error: false, [name]: event.target.value });
+  const { name, email, password, success } = values;
+  
+  const handleChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setValues({ ...values, error: "", [name]: event.target.value });
   };
 
-  const onSubmit = (event) => {
+  const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    setValues({ ...values, error: false });
+    setValues({ ...values, error: "" });
     signup({ name, email, password })
       .then((data) => {
         if (data.error) {
-          setValues({ ...values, error: data.error, success: false });
+          setValues({ ...values, error: data.error, success: "" });
+          notify(data.error);
         } else {
           setValues({
             ...values,
@@ -33,11 +41,12 @@ const Signup = () => {
             email: "",
             password: "",
             error: "",
-            success: true,
+            success: "New account was created successfully.",
           });
+          notify("New account was created successfully.");
         }
       })
-      .catch(console.log("Error in signup"));
+      .catch(() => notify("Error in signup"));
   };
 
   const signUpForm = () => {
@@ -104,26 +113,9 @@ const Signup = () => {
     );
   };
 
-  const errorMessage = () => {
-    return (
-      <div className="row">
-        <div className="col-md-6 offset-sm-3 text-left">
-          <div
-            className="alert alert-danger"
-            style={{ display: error ? "" : "none" }}
-          >
-            {error}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div>
       <Menu />
-
-      {errorMessage()}
       {signUpForm()}
       {successMessage()}
     </div>

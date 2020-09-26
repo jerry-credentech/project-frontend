@@ -1,11 +1,19 @@
 import React, { useState } from "react";
 import { signin, authenticate, isAutheticated } from "../auth/helper/index";
 import { Redirect } from "react-router-dom";
-import Menu from "../core/Menu";
 import Base from "../core/Base";
+import notify from '../notify';
+
+interface ValuesInterface{
+  email: string,
+  password: string,
+  error: string,
+  loading: Boolean,
+  didRedirect: Boolean,
+};
 
 const Signin = () => {
-  const [values, setValues] = useState({
+  const [values, setValues] = useState<ValuesInterface>({
     email: "",
     password: "",
     error: "",
@@ -13,28 +21,34 @@ const Signin = () => {
     didRedirect: false,
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { email, password, error, loading, didRedirect } = values;
+  const { email, password, loading, didRedirect } = values;
   const { user } = isAutheticated();
 
-  const handleChange = (name) => (event) => {
+  const handleChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [name]: event.target.value });
   };
 
-  const onSubmit = (event) => {
+  const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    setValues({ ...values, error: false, loading: true });
+    setValues({ ...values, error: "", loading: true });
     signin({ email, password })
       .then((data) => {
-        if (data.error) {
-          setValues({ ...values, error: data.error, loading: false });
-        } else {
-          setIsLoading(true);
-          authenticate(data, () => {
-            setValues({
-              ...values,
-              didRedirect: true,
+        if (data) {
+          if (data?.error) {
+            setValues({ ...values, error: data.error, loading: false });
+            notify(data.error);
+          } else {
+            setIsLoading(true);
+            authenticate(data, () => {
+              setValues({
+                ...values,
+                didRedirect: true,
+              });
             });
-          });
+          }
+        }
+        else {
+          notify("Something went wrong!");
         }
       })
       .catch((err) => console.log(err));
@@ -59,20 +73,6 @@ const Signin = () => {
           <span className="sr-only">Loading...</span>
         </div>
       )
-    );
-  };
-  const errorMessage = () => {
-    return (
-      <div className="row">
-        <div className="col-md-6 offset-sm-3 text-left">
-          <div
-            className="alert alert-danger"
-            style={{ display: error ? "" : "none" }}
-          >
-            {error}
-          </div>
-        </div>
-      </div>
     );
   };
   const signInForm = () => {
@@ -125,7 +125,6 @@ const Signin = () => {
     description="Enter your Email and Password to login"
     >
       <div className="container mt-3">
-      {errorMessage()}
       {signInForm()}
       {performRedirect()}
       </div>
