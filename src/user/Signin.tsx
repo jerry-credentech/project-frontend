@@ -12,7 +12,7 @@ interface ValuesInterface{
   didRedirect: Boolean,
 };
 
-const Signin = () => {
+const Signin: React.FC = () => {
   const [values, setValues] = useState<ValuesInterface>({
     email: "",
     password: "",
@@ -121,8 +121,8 @@ const Signin = () => {
 
   return (
     <Base
-    title="Sign In Page"
-    description="Enter your Email and Password to login"
+      title="Sign In Page"
+      description="Enter your Email and Password to login"
     >
       <div className="container mt-3">
       {signInForm()}

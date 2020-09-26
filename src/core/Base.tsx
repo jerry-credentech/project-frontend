@@ -1,10 +1,17 @@
 import React from "react";
 import Menu from "./Menu";
 
-const Base = ({
+interface BaseProps  {
+  title: string,
+  description: string,
+  className?: string,
+  children: React.ReactNode
+}
+
+const Base: React.FC<BaseProps> = ({
   title = "My Title",
   description = "My desription",
-  className = "bg-dark text-white  ",
+  className = "bg-dark text-white",
   children,
 }) => (
   <div>
@@ -16,12 +23,6 @@ const Base = ({
       </div>
       <div className={className}>{children}</div>
     </div>
-    {/* <footer className="footer fixed-bottom bg-dark py-3">
-      <div className="container-fluid bg-success text-white text-center py-3">
-        <h4>If you got any questions, feel free to reach out!</h4>
-        <button className="btn btn-warning btn-lg">Contact Us</button>
-      </div>
-    </footer> */}
   </div>
 );
 

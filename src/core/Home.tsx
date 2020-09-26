@@ -3,15 +3,12 @@ import { Link } from "react-router-dom";
 import { isAutheticated } from "../auth/helper/index";
 import Base from "./Base";
 
-const Home = () => {
+const Home: React.FC = () => {
   const {
-    user: { name, email, role },
+    user: { name, email },
   } = isAutheticated();
 
-  console.log(name);
-  console.log(email);
-
-  const adminLeftSide = () => {
+  const AdminLeftSide: React.FC = () => {
     return (
       <div className="card">
         <h4 className="card-header bg-dark text-white">User Navigation</h4>
@@ -30,7 +27,7 @@ const Home = () => {
       </div>
     );
   };
-  const adminRightSide = () => {
+  const AdminRightSide: React.FC = () => {
     return (
       <div className="card">
         <h4 className="card-header text-dark">User Information</h4>
@@ -56,8 +53,8 @@ const Home = () => {
     >
       <div className="container justify-content-center mt-3">
         <div className="row">
-          <div className="col-3">{adminLeftSide()}</div>
-          <div className="col-9">{adminRightSide()}</div>
+          <div className="col-3"><AdminLeftSide /></div>
+          <div className="col-9"><AdminRightSide /></div>
         </div>
       </div>
     </Base>

@@ -12,7 +12,7 @@ interface ValuesInterface{
   success: string,
 };
 
-const Signup = () => {
+const Signup: React.FC = () => {
   const [values, setValues] = useState<ValuesInterface>({
     name: "",
     email: "",

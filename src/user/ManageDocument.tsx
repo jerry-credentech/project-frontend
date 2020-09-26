@@ -7,8 +7,13 @@ import {
 import { isAutheticated } from "../auth/helper";
 import Base from "../core/Base";
 
-const ManageCard = () => {
-  const [cards, setCards] = useState([]);
+interface CardsInterface{
+  _id: string,
+  documentid: string,
+};
+
+const ManageCard: React.FC = () => {
+  const [cards, setCards] = useState<CardsInterface[]>([]);
   const { user, token } = isAutheticated();
   const preload = () => {
     getCards().then((data) => {
@@ -22,7 +27,7 @@ const ManageCard = () => {
   useEffect(() => {
     preload();
   }, []);
-  const deleteThisCard = (cardId) => {
+  const deleteThisCard = (cardId: string) => {
     deleteCard(cardId, user._id, token).then((data) => {
       if (data.error) {
         console.log(data.error);
