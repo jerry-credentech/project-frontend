@@ -1,56 +1,52 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { createCard } from "../admin/helper/adminapicalls";
 import { isAutheticated } from "../auth/helper";
 import Base from "../core/Base";
+import { IDocumentInterface } from "./model/DocumentInterface";
+import notify from '../notify';
 
-const CreateDocument = () => {
+const formData = new FormData();
+
+const CreateDocument: React.FC = () => {
   const { user, token } = isAutheticated();
-  const [values, setValues] = useState({
+
+  const [values, setValues] = useState<IDocumentInterface>({
     documentid: "",
     photo: "",
     loading: false,
     error: "",
-    createdCard: "",
-    getaRedirect: false,
-    formData: "",
+    createdCardname: "",
+    getaRedirect: false
   });
+
   const {
     documentid,
-    photo,
     loading,
-    error,
-    createdCard,
-    getaRedirect,
-    formData,
+    createdCardname,
   } = values;
 
-  const preload = ()=>{
-      setValues({...values, formData: new FormData()});
-  }
-  //Passing an Empty useEffect so everytime something changes it can just rebuild to force updates
-  useEffect(() => {
-      preload();
-  }, []);
-  const handleChange = (documentid) => (event) => {
-    const value = documentid === "photo" ? event.target.files[0] : event.target.value;
+  const handleChange = (documentid: string) => (event: any) => {
+    const value = documentid === "photo" ? event.target.files : event.target.value;
     formData.set(documentid, value);
     setValues({ ...values, [documentid]: value });
   };
-  const onSubmit = (event) => {
+  const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     setValues({ ...values, error: "", loading: true });
     createCard(user._id, token, formData).then((data) => {
       if (data.error) {
         setValues({ ...values, error: data.error });
+        notify(data.error);
       } else {
         setValues({
           ...values,
           documentid: "",
           photo: "",
           loading: false,
-          createdCard: data.name,
+          createdCardname: data.name,
         });
+        notify("Document Upload successfully.");
       }
     });
   };
@@ -58,9 +54,9 @@ const CreateDocument = () => {
     loading && (
       <div
         className="alert alert-success mt-3"
-        style={{ display: createCard ? "" : "none" }}
+        style={{ display: createCard() ? "" : "none" }}
       >
-        <h4>{createdCard} created successfully</h4>
+        <h4>{createdCardname} created successfully</h4>
       </div>
     );
 

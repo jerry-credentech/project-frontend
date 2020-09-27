@@ -1,82 +1,75 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, RouteComponentProps } from "react-router-dom";
 import { getCard, updateCard } from "../admin/helper/adminapicalls";
 import { isAutheticated } from "../auth/helper";
 import Base from "../core/Base";
+import { IDocumentInterface } from "./model/DocumentInterface";
+import notify from '../notify';
 
-const UpdateDocument = ({ match }) => {
+interface MatchParams {
+  cardId: string;
+}
+const formData = new FormData();
+
+const UpdateDocument: React.FC<RouteComponentProps<MatchParams>> = ({ match }) => {
   const { user, token } = isAutheticated();
-  const [values, setValues] = useState({
+
+  const [values, setValues] = useState<IDocumentInterface>({
     documentid: "",
     photo: "",
     loading: false,
     error: "",
-    createdCard: "",
+    createdCardname: "",
     getaRedirect: false,
-    formData: "",
   });
 
-  const {
-    documentid,
-    photo,
-    loading,
-    error,
-    createdCard,
-    getaRedirect,
-    formData,
-  } = values;
-
-  const preload = (cardId) => {
-    getCard(cardId).then((data) => {
-      console.log(data);
-      if (data.error) {
-        setValues({ ...values, error: data.error });
-      } else {
-        console.log(data);
-        setValues({
-          documentid: data.documentid,
-          formData: new FormData(),
-        });
-      }
-    });
-  };
+  const { documentid, createdCardname } = values;
 
   useEffect(() => {
-    preload(match.params.cardId);
-  }, []);
-  const onSubmit = (event) => {
+    if (match.params.cardId) {
+      getCard(match.params.cardId).then((data) => {
+        if (data.error) {
+          setValues({ ...values, error: data.error });
+        } else {
+          formData.set(documentid, data.documentid);
+        }
+      });
+    }
+  }, [match.params.cardId]);
+
+  const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     setValues({ ...values, error: "", loading: true });
-
     //Updating the Card
     updateCard(match.params.cardId, user._id, token, formData).then((data) => {
       if (data.error) {
-        console.log(data.error);
         setValues({ ...values, error: data.error });
+        notify(data.error);
       } else {
-        console.log(data);
         setValues({
           ...values,
           documentid: "",
           photo: "",
           loading: false,
-          createdCard: data.documentid,
+          createdCardname: data.documentid,
         });
+        notify("Document Upload successfully.");
       }
     });
   };
 
-  const handleChange = (name) => (event) => {
-    const value = name === "photo" ? event.target.files[0] : event.target.value;
+  const handleChange = (name: string) => (event: any) => {
+    const value = name === "photo" ? event.target.files : event.target.value;
     formData.set(name, value);
     setValues({ ...values, [name]: value });
   };
+
   const successMessage = () => (
     <div
       className="alert alert-success mt-3"
-      style={{ display: createdCard ? "" : "none" }}
+      style={{ display: createdCardname ? "" : "none" }}
     >
-      <h4>{createdCard} updated successfully</h4>
+      <h4>{createdCardname} updated successfully</h4>
     </div>
   );
   const updateDocumentForm = () => (
@@ -102,9 +95,7 @@ const UpdateDocument = ({ match }) => {
           value={documentid}
         />
       </div>
-      <button
-        type="submit"
-        onClick={onSubmit}
+      <button type="submit" onClick={onSubmit}
         className="btn btn-outline-success mb-3"
       >
         Update Product

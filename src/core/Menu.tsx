@@ -1,9 +1,14 @@
 import React, { Fragment } from "react";
 import { Link, withRouter } from "react-router-dom";
+import { History } from 'history';
 
 import { signout, isAutheticated } from "../auth/helper/index";
 
-const currentTab = (history, path) => {
+interface MenuProps {
+  history: History,
+}
+
+const currentTab = (history: History, path: string) => {
   if (history.location.pathname === path) {
     return { color: "#2ecc72" };
   } else {
@@ -11,7 +16,7 @@ const currentTab = (history, path) => {
   }
 };
 
-const Menu = ({ history }) => {
+const Menu: React.FC<MenuProps> = ({ history }) => {
   return (
     <div>
       <ul className="nav nav-tabs bg-dark">
