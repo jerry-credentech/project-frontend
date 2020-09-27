@@ -6,11 +6,7 @@ import {
 } from "../admin/helper/adminapicalls";
 import { isAutheticated } from "../auth/helper";
 import Base from "../core/Base";
-
-interface CardsInterface{
-  _id: string,
-  documentid: string,
-};
+import { CardsInterface } from './model/DocumentInterface';
 
 const ManageCard: React.FC = () => {
   const [cards, setCards] = useState<CardsInterface[]>([]);
